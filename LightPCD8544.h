@@ -67,6 +67,7 @@ class LightPCD8544 : public Print {
         void    setTextColor(uint8_t color, uint8_t transparentBg = 0xff);
         void    setTextSize(uint8_t size);
 
+        uint8_t getCharWidth(char c);
         uint8_t getStringWidth(const char* str);
         uint8_t getStringWidth(const __FlashStringHelper* str);
 

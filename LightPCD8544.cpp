@@ -280,6 +280,10 @@ size_t LightPCD8544::write(uint8_t c) {
     return 1;
 }
 
+uint8_t LightPCD8544::getCharWidth(char c) {
+    return c > 127 ? 0 : pgm_read_byte(font_width + c);
+}
+
 uint8_t LightPCD8544::getStringWidth(const char* str) {
     if(str == NULL) return 0;
     
