@@ -69,7 +69,9 @@ class LightPCD8544 : public Print {
 
         uint8_t getCharWidth(char c);
         uint8_t getStringWidth(const char* str);
+        #ifdef AVR
         uint8_t getStringWidth(const __FlashStringHelper* str);
+        #endif
 
         virtual size_t write(uint8_t);
 

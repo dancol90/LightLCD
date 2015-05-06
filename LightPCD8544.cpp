@@ -300,6 +300,7 @@ uint8_t LightPCD8544::getStringWidth(const char* str) {
     return w;
 }
 
+#ifdef AVR
 uint8_t LightPCD8544::getStringWidth(const __FlashStringHelper* str) {
     if(str == NULL) return 0;
     
@@ -316,6 +317,7 @@ uint8_t LightPCD8544::getStringWidth(const __FlashStringHelper* str) {
     
     return w;
 }
+#endif
 
 // ############################################################################################
 

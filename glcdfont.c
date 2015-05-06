@@ -1,12 +1,11 @@
-#include <avr/io.h>
-#include <avr/pgmspace.h> 
- 
+#include <Arduino.h>
+
 #ifndef FONT5X7_H
 #define FONT5X7_H
 
 // standard ascii 5x7 font
 
-static unsigned const char  font[] PROGMEM = {
+static unsigned const char font[] PROGMEM = {
     0x00, 0x00, 0x00, 0x00, 0x00,   
 	0x3E, 0x5B, 0x4F, 0x5B, 0x3E, 	
 	0x3E, 0x6B, 0x4F, 0x6B, 0x3E, 	
