@@ -1,6 +1,6 @@
 /*############################################################################################
- LightPCD8544
- Lightweight library for Nokia LCD
+ LightLCD
+ Lightweight library for various LCD
 
  Author: Daniele Colanardi
  License: BSD, see LICENSE file
@@ -11,14 +11,11 @@
 #ifndef _LIGHT_PCD8544_H
 #define _LIGHT_PCD8544_H
 
-#include "Arduino.h"
+#include "LightLCD.h"
 #include <SPI.h>
 
 #define BLACK 1
 #define WHITE 0
-
-#define LCD_WIDTH 84
-#define LCD_HEIGHT 48
 
 #define PCD8544_POWERDOWN 0x04
 #define PCD8544_ENTRYMODE 0x02
@@ -38,62 +35,125 @@
 #define PCD8544_SETBIAS 0x10
 #define PCD8544_SETVOP 0x80
 
-#define BUFFER_SIZE LCD_WIDTH * LCD_HEIGHT / 8
-
-class LightPCD8544 : public Print {
+class LightPCD8544 : public LightLCD {
     public:
-        LightPCD8544(uint8_t DC, uint8_t CS);
+        LightPCD8544(uint8_t DC, uint8_t CS) : dc(DC), cs(CS) {}
 
-        void    begin(uint8_t contrast = 40);
+        void begin() {
+            // set pin directions
+            pinMode(dc, OUTPUT);
+            pinMode(cs, OUTPUT);
+            
+            //pinMode(SS, OUTPUT);
 
-        void    setContrast(uint8_t val);
-        void    clear();
-        void    update();
+            SPI.begin();
+            SPI.setClockDivider(SPI_CLOCK_DIV16);
 
-        void    drawPixel(uint8_t x, uint8_t y, uint8_t color);
+            // Enter extended instruction mode
+            command(PCD8544_FUNCTIONSET | PCD8544_EXTENDEDINSTRUCTION );
 
-        void    invertDisplay(uint8_t i);
+            // LCD bias select (4 is optimal?)
+            command(PCD8544_SETBIAS | 0x4);
 
-        void    drawLine(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t color);
-        void    drawVLine(uint8_t x, uint8_t y, uint8_t h, uint8_t color);
-        void    drawHLine(uint8_t x, uint8_t y, uint8_t w, uint8_t color);
-        void    drawRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t color);
-        void    fillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t color);
+            // Set contrast
+            //if (contrast > 0x7f)
+            //    contrast = 0x7f;
 
+            //command(PCD8544_SETVOP | contrast);
 
-        uint8_t drawChar(uint8_t x, uint8_t y, uint8_t c, uint8_t color = 1, uint8_t transparentBg = 1, uint8_t size = 1);
+            // Return to normal instruction mode
+            command(PCD8544_FUNCTIONSET);
 
-        void    setCursor(uint8_t x, uint8_t y);
-        void    setTextColor(uint8_t color, uint8_t transparentBg = 0xff);
-        void    setTextSize(uint8_t size);
+            // Set display to not Inverted
+            command(PCD8544_DISPLAYCONTROL | PCD8544_DISPLAYNORMAL);
 
-        uint8_t getCharWidth(char c);
-        uint8_t getStringWidth(const char* str);
-        #ifdef AVR
-        uint8_t getStringWidth(const __FlashStringHelper* str);
-        #endif
+            // Clear the buffer to init it.
+            clear();
 
-        virtual size_t write(uint8_t);
+            // Show a blank screen
+            update();
+        }
 
+        void setContrast(uint8_t val) {
+            if (val > 0x7f)
+                val = 0x7f;
+            
+            command(PCD8544_FUNCTIONSET | PCD8544_EXTENDEDINSTRUCTION );
+            command(PCD8544_SETVOP | val); 
+            command(PCD8544_FUNCTIONSET);
+        }
 
-    private:
+        void clear() {
+            memset(buffer, 0, 84 * 48 / 8);
+            resetLimits(true);
+            
+            cursor_y = cursor_x = 0;
+        }
+
+        void update() {
+            if(limits.y0 == limits.y1)
+                return;
+            
+            for(uint8_t y = limits.y0 / 8; y <= (limits.y1 - 1) / 8; y++) {
+                command(PCD8544_SETYADDR | y);
+
+                command(PCD8544_SETXADDR | limits.x0);
+
+                digitalWrite(dc, HIGH);
+
+                // Activate chip
+                digitalWrite(cs, LOW);
+
+                for(uint8_t x = limits.x0; x < limits.x1; x++)
+                    SPI.transfer(buffer[(width() * y) + x]);
+                    //SPI.transfer(0xFF);
+                
+                // Disable chip
+                digitalWrite(cs, HIGH);
+
+            }
+
+            command(PCD8544_SETYADDR);  // no idea why this is necessary but it is to finish the last byte?
+
+            resetLimits(false);
+        }
+
+        void drawPixel(uint8_t x, uint8_t y, uint8_t color) {
+            if ((x < 0) || (x >= width()) || (y < 0) || (y >= height()))
+                return;
+
+            //bitWrite(buffer[x + (y / 8) * width()], y % 8, color);
+            if (color) 
+                buffer[x + (y / 8)*width()] |= _BV(y%8);
+            else
+                buffer[x + (y / 8)*width()] &= ~_BV(y%8);
+
+            expandLimits(x, y);
+        }
+
+        void invertDisplay(uint8_t i) {
+            command(PCD8544_DISPLAYCONTROL | (i ? PCD8544_DISPLAYINVERTED : PCD8544_DISPLAYNORMAL));
+        }
+
+        int width()  { return 84; }
+        int height() { return 48; }
+
+    protected:
         uint8_t dc, cs;
-        struct {
-            uint8_t x0, y0;
-            uint8_t x1, y1;
-        } limits;
 
-        uint8_t cursor_x, cursor_y;
-        uint8_t text_prop;
+        uint8_t buffer[84 * 48 / 8];
 
-        uint8_t buffer[BUFFER_SIZE];
+        void command(uint8_t c) {
+            // Signal DATA mode
+            digitalWrite(dc, LOW);
+            // Enable chip
+            digitalWrite(cs, LOW);
 
-        void command(uint8_t c);
+            SPI.transfer(c);
 
-        void resetLimits(uint8_t whole);
-        void expandLimits(uint8_t x, uint8_t y);
-
+            // Disable chip
+            digitalWrite(cs, HIGH);
+        }
 };
 
 #endif
-

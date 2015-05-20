@@ -1,17 +1,18 @@
-#include <SPI.h>
-#include <LightPCD8544.h>
+#include <Wire.h>
+#include <LightLCD.h>
+#include <LightSSD1306.h>
 
-LightPCD8544 lcd = LightPCD8544(8, 9);
+LightSSD1306 lcd = LightSSD1306();
 
 void setup()
 {
   lcd.begin();
-  lcd.setContrast(50);
+  //lcd.setContrast(50);
 }
 
 void loop()
 {
-  lcd.clearDisplay();
+  lcd.clear();
   
   lcd.setCursor(0, 0);
   
@@ -19,30 +20,30 @@ void loop()
   lcd.println("ABCDEFGHIJKLM");
   lcd.println("NOPQRSTUVWXYZ");
   
-  lcd.display();
+  lcd.update();
   delay (5000);
   
-  lcd.clearDisplay();
+  lcd.clear();
   lcd.println("Lower case:");
   lcd.println("abcdefghijklm");
   lcd.println("nopqrstuvwxyz");
   
-  lcd.display();
+  lcd.update();
   delay (5000);
   
-  lcd.clearDisplay();
+  lcd.clear();
   lcd.println("Numbers:");
   lcd.println("0123456789");
   
-  lcd.display();
+  lcd.update();
   delay (5000);
   
-  lcd.clearDisplay();
+  lcd.clear();
   lcd.println("Special:");
   lcd.println("!\"#$%&'()*+,-.");
   lcd.println("/:;<=>?@[\\]^_`");
   lcd.println("{|}~");
   
-  lcd.display();
+  lcd.update();
   delay (5000);
 }
