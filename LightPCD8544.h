@@ -14,6 +14,8 @@
 #include "LightLCD.h"
 #include <SPI.h>
 
+#define PCD8544
+
 #define BLACK 1
 #define WHITE 0
 

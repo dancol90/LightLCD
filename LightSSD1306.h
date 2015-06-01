@@ -14,6 +14,8 @@
 #include "LightLCD.h"
 #include <Wire.h>
 
+#define SSD1306
+
 #define BLACK 1
 #define WHITE 0
  
@@ -59,8 +61,6 @@ class LightSSD1306 : public LightLCD {
         LightSSD1306() {}
 
         void begin() {
-            Wire.begin();
-
             byte command_sequence[] = {
                 SSD1306_DISPLAYOFF,
                 SSD1306_SETDISPLAYCLOCKDIV, 0x80,

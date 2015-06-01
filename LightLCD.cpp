@@ -9,12 +9,12 @@
 ############################################################################################*/
 
 #include "LightLCD.h"
-#include "glcdfont.c"
+#include "glcdfont.h"
 
 #define swap(a, b) { uint8_t t = a; a = b; b = t; }
 
 // Variable width() font table
-extern const uint8_t PROGMEM font[];
+//extern const uint8_t font[];
 
 // ############################################################################################
 
@@ -183,7 +183,6 @@ uint8_t LightLCD::getStringWidth(const char* str) {
     return w;
 }
 
-#ifdef AVR
 uint8_t LightLCD::getStringWidth(const __FlashStringHelper* str) {
     if(str == NULL) return 0;
     
@@ -200,7 +199,7 @@ uint8_t LightLCD::getStringWidth(const __FlashStringHelper* str) {
     
     return w;
 }
-#endif
+
 
 // ############################################################################################
 
