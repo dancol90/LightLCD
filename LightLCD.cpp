@@ -22,7 +22,7 @@ LightLCD::LightLCD() {
     cursor_y = 0;
     cursor_x = 0;
     
-    text_prop = 1;
+    text_prop = { 1, 1, 1 };
 }
 
 // ############################################################################################
@@ -142,7 +142,7 @@ uint8_t LightLCD::drawChar(uint8_t x, uint8_t y, uint8_t c, uint8_t color, uint8
         }
     }
     
-    return len + 1;
+    return (len * size) + 1;
 }
 
 size_t LightLCD::write(uint8_t c) {
@@ -150,7 +150,7 @@ size_t LightLCD::write(uint8_t c) {
         cursor_y += 1 * 8;
         cursor_x = 0;
     } else if (c != '\r')  {
-        uint8_t c_width = drawChar(cursor_x, cursor_y, c, bitRead(text_prop, 0), bitRead(text_prop, 1));
+        uint8_t c_width = drawChar(cursor_x, cursor_y, c, text_prop.color, text_prop.transparent, text_prop.size);
         
         cursor_x += 1 * c_width;
         
@@ -164,7 +164,7 @@ size_t LightLCD::write(uint8_t c) {
 }
 
 uint8_t LightLCD::getCharWidth(char c) {
-    return c > 127 ? 0 : pgm_read_byte(font_width + c);
+    return c > 127 ? 0 : (pgm_read_byte(font_width + c) * text_prop.size);
 }
 
 uint8_t LightLCD::getStringWidth(const char* str) {
@@ -213,10 +213,13 @@ void LightLCD::setCursor(uint8_t x, uint8_t y) {
 
 void LightLCD::setTextColor(uint8_t color, uint8_t transparentBg) {
     if(transparentBg != 0xff)
-        bitWrite(text_prop, 1, transparentBg);
+        //bitWrite(text_prop, 1, transparentBg);
+        text_prop.transparent = transparentBg;
 
-    bitWrite(text_prop, 0, color);
+    //bitWrite(text_prop, 0, color);
+    text_prop.color = color;
 }
 void LightLCD::setTextSize(uint8_t size) {
-    text_prop = (text_prop & 0x03) | (size << 2);
+    //text_prop = (text_prop & 0x03) | (size << 2);
+    text_prop.size = size;
 }

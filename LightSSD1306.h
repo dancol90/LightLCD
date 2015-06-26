@@ -15,9 +15,6 @@
 #include <Wire.h>
 
 #define SSD1306
-
-#define BLACK 1
-#define WHITE 0
  
 #define SSD1306_SETCONTRAST 0x81
 #define SSD1306_DISPLAYALLON_RESUME 0xA4
@@ -61,6 +58,8 @@ class LightSSD1306 : public LightLCD {
         LightSSD1306() {}
 
         void begin() {
+            Wire.begin();
+
             byte command_sequence[] = {
                 SSD1306_DISPLAYOFF,
                 SSD1306_SETDISPLAYCLOCKDIV, 0x80,
@@ -104,8 +103,8 @@ class LightSSD1306 : public LightLCD {
                     limits.x0,  // Which column to start from
                     limits.x1,  // To which
                 SSD1306_PAGEADDR,
-                    limits.y0 / 8,
-                    limits.y1 / 8
+                    (byte)(limits.y0 / 8),
+                    (byte)(limits.y1 / 8)
             };
 
             commandList(command_list, 6);

@@ -13,6 +13,9 @@
 
 #include "Arduino.h"
 
+#define BLACK 1
+#define WHITE 0
+
 struct Limits {
     uint8_t x0, y0;
     uint8_t x1, y1;
@@ -55,7 +58,13 @@ class LightLCD : public Print {
         Limits limits;
 
         uint8_t cursor_x, cursor_y;
-        uint8_t text_prop;
+        //uint8_t text_prop;
+
+        struct TextProp {
+            uint8_t color : 1;
+            uint8_t transparent : 1;
+            uint8_t size    : 6;
+        } text_prop;
 
         void resetLimits(uint8_t whole);
         void expandLimits(uint8_t x, uint8_t y);
