@@ -202,6 +202,8 @@ uint8_t LightLCD::getStringWidth(const __FlashStringHelper* str) {
 
 
 // ############################################################################################
+uint8_t LightLCD::getCursorX() { return cursor_x; }
+uint8_t LightLCD::getCursorY() { return cursor_y; }
 
 void LightLCD::setCursor(uint8_t x, uint8_t y) {
     if ((x < 0) || (x >= width()) || (y < 0) || (y >= height()))

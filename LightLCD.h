@@ -41,6 +41,9 @@ class LightLCD : public Print {
 
         uint8_t drawChar(uint8_t x, uint8_t y, uint8_t c, uint8_t color = 1, uint8_t transparentBg = 1, uint8_t size = 1);
 
+        uint8_t getCursorX();
+        uint8_t getCursorY();
+
         void    setCursor(uint8_t x, uint8_t y);
         void    setTextColor(uint8_t color, uint8_t transparentBg = 0xff);
         void    setTextSize(uint8_t size);
