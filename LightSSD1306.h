@@ -60,6 +60,8 @@ class LightSSD1306 : public LightLCD {
         void begin() {
             Wire.begin();
 
+            Wire.setClock(400000);
+
             byte command_sequence[] = {
                 SSD1306_DISPLAYOFF,
                 SSD1306_SETDISPLAYCLOCKDIV, 0x80,
