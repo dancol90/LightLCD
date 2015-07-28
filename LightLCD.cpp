@@ -142,7 +142,7 @@ uint8_t LightLCD::drawChar(uint8_t x, uint8_t y, uint8_t c, uint8_t color, uint8
         }
     }
     
-    return (len * size) + 1;
+    return (len + 1) * size;
 }
 
 size_t LightLCD::write(uint8_t c) {
@@ -152,7 +152,7 @@ size_t LightLCD::write(uint8_t c) {
     } else if (c != '\r')  {
         uint8_t c_width = drawChar(cursor_x, cursor_y, c, text_prop.color, text_prop.transparent, text_prop.size);
         
-        cursor_x += text_prop.size * c_width;
+        cursor_x += c_width;
         
         if (cursor_x >= width()) {
             cursor_y += text_prop.size * 8;
@@ -175,7 +175,7 @@ uint8_t LightLCD::getStringWidth(const char* str) {
     
     while(*ptr != 0) { 
         // Add the single char's width + 1 blank column
-        w += pgm_read_byte(font_width + *ptr) + 1;
+        w += getCharWidth(*ptr) + text_prop.size;
         
         ptr++;
     }
@@ -192,7 +192,7 @@ uint8_t LightLCD::getStringWidth(const __FlashStringHelper* str) {
     
     while(c != 0) { 
         // Add the single char's width() + 1 blank column
-        w += pgm_read_byte(font_width + c) + 1;
+        w += getCharWidth(c) + text_prop.size;
         
         c = pgm_read_byte(ptr++);
     }
