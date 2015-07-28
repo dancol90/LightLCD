@@ -147,15 +147,15 @@ uint8_t LightLCD::drawChar(uint8_t x, uint8_t y, uint8_t c, uint8_t color, uint8
 
 size_t LightLCD::write(uint8_t c) {
     if (c == '\n') {
-        cursor_y += 1 * 8;
+        cursor_y += text_prop.size * 8;
         cursor_x = 0;
     } else if (c != '\r')  {
         uint8_t c_width = drawChar(cursor_x, cursor_y, c, text_prop.color, text_prop.transparent, text_prop.size);
         
-        cursor_x += 1 * c_width;
+        cursor_x += text_prop.size * c_width;
         
         if (cursor_x >= width()) {
-            cursor_y += 1 * 8;
+            cursor_y += text_prop.size * 8;
             cursor_x = 0;
         }
     }
