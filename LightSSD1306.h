@@ -53,6 +53,9 @@
 #define SSD1306_EXTERNALVCC 0x1
 #define SSD1306_SWITCHCAPVCC 0x2
 
+#define SSD1306_LOWCONTRAST      0x00
+#define SSD1306_FULLCONTRAST     0xCF
+
 class LightSSD1306 : public LightLCD {
     public:
         LightSSD1306() {}
@@ -73,7 +76,7 @@ class LightSSD1306 : public LightLCD {
                 SSD1306_SEGREMAP | 0x1,
                 SSD1306_COMSCANDEC,                    
                 SSD1306_SETCOMPINS,         0x12,
-                SSD1306_SETCONTRAST,        0xCF,
+                SSD1306_SETCONTRAST,        SSD1306_FULLCONTRAST,
                 SSD1306_SETPRECHARGE,       0xF1,
                 SSD1306_SETVCOMDETECT,      0x40,
                 SSD1306_DISPLAYALLON_RESUME,
@@ -87,7 +90,32 @@ class LightSSD1306 : public LightLCD {
             update();
         }
 
-        void setContrast(uint8_t val) {};
+        /* Sets the the display "contrast" into three modes:
+         * 
+         * 0 - display is off (sleep)
+         * 1 - display resume and go to low contrast
+         * 2 - display resume and go to full contrast
+         */
+        void setContrast(uint8_t val) {
+            // set display contrast into three states
+            switch (val) {
+                case 0:
+                    // go to "sleep" mode 0xAE
+                    command(SSD1306_DISPLAYOFF);
+                    break;
+                case 1:
+                    // resume and go to low contrast
+                    command(SSD1306_DISPLAYON);
+                    command(SSD1306_SETCONTRAST);
+                    command(SSD1306_LOWCONTRAST);
+                    break;
+                default:
+                    // resume and go to full contrast
+                    command(SSD1306_DISPLAYON);
+                    command(SSD1306_SETCONTRAST);
+                    command(SSD1306_FULLCONTRAST);
+            }
+        }
 
         void clear() {
             memset(buffer, 0, width() * height() / 8);
@@ -170,4 +198,3 @@ class LightSSD1306 : public LightLCD {
 };
 
 #endif
-
