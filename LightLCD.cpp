@@ -145,6 +145,31 @@ uint8_t LightLCD::drawChar(uint8_t x, uint8_t y, uint8_t c, uint8_t color, uint8
     return (len + 1) * size;
 }
 
+/* Draw XBitMap Files (*.xbm), exported from GIMP,
+ * Uses PROGMEM array directly from *.xbm as this:
+ * 
+ *  const static uint8_t image[] PROGMEM = { ... };
+ * 
+*/
+void LightLCD::drawXBitmap(uint8_t x, uint8_t y,
+                 const uint8_t *bitmap, uint8_t width, uint8_t height,
+                 uint8_t color, uint8_t transparentBg) {
+
+    int16_t i, j, byteWidth = (width + 7) / 8;
+
+    for(j=0; j<height; j++) {
+        for(i=0; i<width; i++ ) {
+            if(pgm_read_byte(bitmap + j * byteWidth + i / 8) & (1 << (i % 8))) {
+                // draw foreground
+                drawPixel(x+i, y+j, color);
+            } else if (!transparentBg) {
+                // optionaly draw background (default no)
+                drawPixel(x+i, y+j, !color);
+            }
+        }
+    }
+}
+
 size_t LightLCD::write(uint8_t c) {
     if (c == '\n') {
         cursor_y += text_prop.size * 8;
