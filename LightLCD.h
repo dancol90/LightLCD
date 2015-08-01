@@ -38,8 +38,8 @@ class LightLCD : public Print {
         void    drawRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t color);
         void    fillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t color);
 
-
         uint8_t drawChar(uint8_t x, uint8_t y, uint8_t c, uint8_t color = 1, uint8_t transparentBg = 1, uint8_t size = 1);
+        void    drawXBitmap(uint8_t x, uint8_t y, const uint8_t *bitmap, uint8_t width, uint8_t height, uint8_t color, uint8_t transparentBg=1);
 
         uint8_t getCursorX();
         uint8_t getCursorY();
