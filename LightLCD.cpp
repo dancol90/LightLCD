@@ -154,18 +154,30 @@ uint8_t LightLCD::drawChar(uint8_t x, uint8_t y, uint8_t c, uint8_t color, uint8
 void LightLCD::drawXBitmap(uint8_t x, uint8_t y,
                  const uint8_t *bitmap, uint8_t width, uint8_t height,
                  uint8_t color, uint8_t transparentBg) {
+    // NOTE: being 8bit long, max width & height is 255.
+    uint8_t i, j;
+    // Pixel blocks (bytes) for each row of the bitmap
+    uint8_t blocksPerRow = (w + 7) / 8;
 
-    int16_t i, j, byteWidth = (width + 7) / 8;
+    uint8_t bit, block;
+    int8_t  final_color;
 
-    for(j=0; j<height; j++) {
-        for(i=0; i<width; i++ ) {
-            if(pgm_read_byte(bitmap + j * byteWidth + i / 8) & (1 << (i % 8))) {
-                // draw foreground
-                drawPixel(x+i, y+j, color);
-            } else if (!transparentBg) {
-                // optionaly draw background (default no)
-                drawPixel(x+i, y+j, !color);
-            }
+    for (j = 0; j < h; j++) {
+        for (i = 0; i < w; i++ ) {
+            // The current pixel in the block.
+            bit = i % 8;
+
+            // Get the next block from flash only if needed
+            if (bit == 0)
+                block = pgm_read_byte(bitmap + j * blocksPerRow + i / 8);
+
+            // Decide the color
+            final_color = block & (1 << bit) ? color // Foreground pixel
+                        : transparentBg      ? -1    // Background pixel, do not draw
+                        : !color;                    // Background pixel, draw it
+
+            if(final_color != -1)
+                drawPixel(x + i, y + j, final_color);
         }
     }
 }
