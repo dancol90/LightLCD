@@ -1,0 +1,39 @@
+
+#include <Wire.h>
+#include <LightLCD.h>
+#include <LightSSD1306.h>
+
+LightSSD1306 lcd = LightSSD1306();
+
+// XBitmap array
+const static uint8_t xImage[] PROGMEM = {
+   0x00, 0x01, 0x00, 0x00, 0x01, 0x00, 0x04, 0x41, 0x00, 0x08, 0x20, 0x00,
+   0x80, 0x03, 0x00, 0xe0, 0x0e, 0x00, 0x20, 0x08, 0x00, 0x30, 0x18, 0x00,
+   0x17, 0xd0, 0x01, 0x30, 0x18, 0x00, 0x20, 0x08, 0x00, 0xe0, 0x0e, 0x00,
+   0x80, 0x03, 0x00, 0x08, 0x20, 0x00, 0x04, 0x41, 0x00, 0x00, 0x01, 0x00,
+   0x00, 0x01, 0x00 }; // 17x17px
+
+void setup() {
+    //Serial.begin(115200);
+    lcd.begin();
+}
+
+void loop() {
+    uint8_t x, y;
+    // image width, height
+    uint8_t w = 17, h = 17;
+    
+    // calculate center position
+    x = lcd.width()/2 - w/2;
+    y = lcd.height()/2 - h/2;
+    
+    // draw xImage with white
+    lcd.drawXBitmap(x, y, xImage, w, h, 1);
+    lcd.update();
+    delay(1000);
+
+    // draw xImage with black (clear)
+    lcd.drawXBitmap(x, y, xImage, w, h, 0);
+    lcd.update();
+    delay(1000);
+}
