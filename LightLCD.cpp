@@ -157,13 +157,13 @@ void LightLCD::drawXBitmap(uint8_t x, uint8_t y,
     // NOTE: being 8bit long, max width & height is 255.
     uint8_t i, j;
     // Pixel blocks (bytes) for each row of the bitmap
-    uint8_t blocksPerRow = (w + 7) / 8;
+    uint8_t blocksPerRow = (width + 7) / 8;
 
     uint8_t bit, block;
     int8_t  final_color;
 
-    for (j = 0; j < h; j++) {
-        for (i = 0; i < w; i++ ) {
+    for (j = 0; j < height; j++) {
+        for (i = 0; i < width; i++ ) {
             // The current pixel in the block.
             bit = i % 8;
 
