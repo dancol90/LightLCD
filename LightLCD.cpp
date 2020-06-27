@@ -159,7 +159,7 @@ void LightLCD::drawXBitmap(uint8_t x, uint8_t y,
     // Pixel blocks (bytes) for each row of the bitmap
     uint8_t blocksPerRow = (width + 7) / 8;
 
-    uint8_t bit, block;
+    uint8_t bit, block = 0;
     int8_t  final_color;
 
     for (j = 0; j < height; j++) {
